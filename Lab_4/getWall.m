@@ -46,7 +46,7 @@ switch(absDir)
         wall = maze.x( size2-curPos(2), curPos(1));
     %West Wall of curPos
     case pi 
-        wall = maze.y(size2-curPos(2), curPos(1));
+        wall = maze.y( size2-curPos(2), curPos(1));
     %South Wall of curPos
     case 3*pi/2 
         wall = maze.x( size3-curPos(2), curPos(1));

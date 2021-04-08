@@ -1,11 +1,12 @@
 clear; clc; close all;
 
 %Maze metadata provided
-load tests;
+load tests_user;
 %pre allocate variables
-moves = cell(10,2);
-solution = cell(10,2);
-correct = ones(10,2,2);
+% Test 11 is user defined
+moves = cell(11,2);
+solution = cell(11,2);
+correct = ones(11,2,2);
 
 for i = 1:length(tests) %For all test casesd
     maze = tests(i).maze; %load maze structure
@@ -34,7 +35,7 @@ for i = 1:length(tests) %For all test casesd
         %List of moves generate by YOUR explore function
         moves{i,j} = explore(maze, handRule);
         %draw your path
-        [explored, a] = drawPath(maze, moves{i,j}, true,'k');
+        [explored, a] = drawPath(maze, moves{i,j}, false, 'k');
         
         %print results of test
         fprintf('\t\tExplore\n');
@@ -62,7 +63,7 @@ for i = 1:length(tests) %For all test casesd
         %find solution moveList based on YOUR solve function
         solution{i,j} = optimize(moves{i,j},handRule);
         %draw the optimized path
-        [run,a] = drawPath(maze, solution{i,j}, true, 'b');
+        [run,a] = drawPath(maze, solution{i,j}, false, 'b');
         %print results of test
         fprintf('\t\tOptimize\n');
         solution{i,j} = replace(solution{i,j},[notHand,notHand],[handRule,handRule]);

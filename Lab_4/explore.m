@@ -14,18 +14,15 @@
 %   taken
 %
 %   Author: Jacob Hoffer
-%   Date:
+%   Date: 4/8/21
 
 function moveList = explore(maze, handRule)
     %Create/initialize variables
 
-    curPos = maze.start;
-    curDir = maze.startDir;
+    curPos = maze.start; % Get starting position
+    curDir = maze.startDir; % Get finish position
 
-    robotMatrix =  [cos(curDir),    -sin(curDir),   curPos(1);
-                    sin(curDir),    -cos(curDir),   curPos(2);
-                    0,              0,              1];
-
+    % Create wall check order
     if handRule == 'R'
         checkOrder = ['R', 'F', 'L'];
     else
@@ -33,42 +30,58 @@ function moveList = explore(maze, handRule)
     end
 
     moveList = ''; %create empty char array
-    % i = 1; %counting variable
-    while(robotMatrix(1:2,3) ~= maze.finish)
-        % Write code to explore maze according to the given hand rule
-        for i = 1:3
+    
+    while(~isequal(curPos, maze.finish)) % Contine until finish positon is reached
+        for i = 1:3 % Check for wall
             wall = getWall(maze, curPos, curDir, checkOrder(i));
-            if ~wall
-                break;
+            if ~wall % If no wall, then move
+                [curPos, curDir, moveList] = move(curPos, curDir, ...
+                    moveList, checkOrder(i), handRule);
+                break; % 
             end
         end
-        [robotMatrix, moveList] = move(robotMatrix, moveList, checkOrder(i));
-        disp(robotMatrix);
-        w = waitforbuttonpress;
-    end
-end
-
-function [robotMatrix, moveList] = move(robotMatrix, moveList, side)
-    if side == 'R'
-        dir = -pi / 2;
-        T = [cos(dir), -sin(dir),  1;
-             sin(dir), -cos(dir),  0;
-             0,         0,         1];
-        moveList = [moveList, 'RF'];
-    elseif side == 'L'
-        dir = pi / 2;
-        T = [cos(dir), -sin(dir), -1;
-             sin(dir), -cos(dir),  0;
-             0,         0,         1];
-        moveList = [moveList, 'LF'];
-    else
-        dir = 0;
-        T = [cos(dir), -sin(dir), -1;
-             sin(dir), -cos(dir),  0;
-             0,         0,         1];
-        moveList = [moveList, 'F'];
+        if wall % If walls exist on all three sides, turn arround
+            [curPos, curDir, moveList] = move(curPos, curDir, ...
+            moveList, 'B', handRule);
+        end
     end
     
-    robotMatrix = T * robotMatrix;
+end
+
+% function to turn and move
+function [curPos, curDir, moveList] = move(curPos, curDir, moveList, ...
+    side, handRule)
+    if side == 'R'
+         curDir = curDir - pi / 2; % Change direction
+         moveList = [moveList, 'RF']; % Record moves
+    elseif side == 'L'
+        curDir = curDir + pi / 2;
+        moveList = [moveList, 'LF'];
+    elseif side == 'F'
+        moveList = [moveList, 'F'];
+    else % reached if robot found deadend and turns around
+        curDir = curDir - pi;
+        if handRule == 'R'
+            moveList = [moveList, 'LLF'];  
+        else
+            moveList = [moveList, 'RRF'];
+        end
+              
+    end
+    
+    % Taken from getWall.m
+    curDir = wrapAngle(curDir); %limit absolute direction to 0-2*pi
+
+    % Move 1 unit forward in the direction found above
+    switch(curDir)
+        case 0 
+            curPos = curPos + [1 0];
+        case pi/2 
+            curPos = curPos + [0 1];
+        case pi 
+            curPos = curPos + [-1 0];
+        case 3*pi/2 
+            curPos = curPos + [0 -1];
+    end
     
 end
