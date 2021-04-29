@@ -49,5 +49,6 @@ def invKinematics(L_1, L_2, x, y):
         reachable = False
     else:
         reachable = True
+        theta_1 = theta_1[0]
 
     return theta_1, theta_2, reachable

@@ -15,26 +15,36 @@ def draw_path():
     x = np.array([1, 2, 3])
     y = np.array([1, 2, 3])
     # Choose the lengths of the arm links
-    l1 = 3
-    l2 = 3
-    plot_size = l1+l2+1
+    L_1 = 3
+    L_2 = 3
+    plot_size = L_1 + L_2 + 1
 
     # Preallocate arrays for theta_1, theta_2, P_tool, and P_2
     # theta_1 and theta_2 will be 1xn arrays, where n is the number of coordinate pairs
     # you made
     # P_tool and P_2 are 2xn arrays
 
-
     # for every coordinate
         # Call invKinematics to find the thetas to make the tooltip reach that point
         # Call fwdKinematics with your link lengths and found thetas to
         # find the P_tool and P_2 positions at each point
 
+    coordinates = np.array([x, y]).T
+    thetas = np.array([invKinematics(L_1, L_2, coord[0], coord[1]) for coord in coordinates])
+    if not any(thetas[:, 2]):
+        print('No angles exist to meet conditions')
+        return
+
+    positions = np.array([fwdKinematics(L_1, L_2, pair[0], pair[1]) for pair in thetas[:, :-1]])
+
+    P_tool = positions[:, 0].T
+    P_2 = positions[:, 1].T
+
     # Call savePathAs Video with inputs:
     # String of video name, including .mp4
     # The complete list of P_tool points as a 2xn array
     # The complete list of P_2 points as a 2xn array
-    savePathAsVideo('yourPath.mp4', 'YOUR P_TOOL VALUES', 'YOUR P_2 VALUES')
+    savePathAsVideo('yourPath.mp4', P_tool, P_2)
 
     # Create an array of 0:n values to use as time
     t = np.arange(len(x))
