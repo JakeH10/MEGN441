@@ -12,8 +12,21 @@ from savePathAsVideo import *
 def draw_path():
 
     # Build your path as a list of x and y coordinates
-    x = np.array([1, 2, 3])
-    y = np.array([1, 2, 3])
+
+    laterals = np.array([[0, -2.5], [-2.5, -2.5], [-2.5, -1.5], [-1.5, -1.5], [-1.5, -4.5], [-4.5, -4.5], [-4.5, -3.9],
+                         [-3.9, -3.9], [-3.9, -4.5], [-4.5, -4.5], [-4.5, -2.2], [-2.2, 0]])
+    verticals = np.array([[-1.8, 1.4], [1.4, -2.1], [-2.1, -2.1], [-2.1, -3.4], [-3.4, -3.4], [-3.4, -2], [-2, -2],
+                          [-2, 2.6], [2.6, 2.6], [2.6, 3.9], [3.9, 3.9], [3.9, 0.9]])
+
+    laterals = np.concatenate([laterals, -np.flip(laterals, (0, 1))], axis=0)
+    verticals = np.concatenate([verticals, np.flip(verticals)], axis=0)
+
+    x = np.concatenate([np.linspace(lateral[0], lateral[1], 5) for lateral in laterals])
+    y = np.concatenate([np.linspace(vertical[0], vertical[1], 5) for vertical in verticals])
+
+    x = np.concatenate([x, np.ones([1, 10])[0] * x[-1]])
+    y = np.concatenate([y, np.ones([1, 10])[0] * y[-1]])
+
     # Choose the lengths of the arm links
     L_1 = 3
     L_2 = 3
@@ -44,7 +57,7 @@ def draw_path():
     # String of video name, including .mp4
     # The complete list of P_tool points as a 2xn array
     # The complete list of P_2 points as a 2xn array
-    savePathAsVideo('yourPath.mp4', P_tool, P_2)
+    savePathAsVideo('Mines_M.mp4', P_tool, P_2)
 
     # Create an array of 0:n values to use as time
     t = np.arange(len(x))
@@ -52,9 +65,9 @@ def draw_path():
     # Create a first plot window
     f1 = plt.figure(1)
     # Plot P_tool x vs time
-    x_plot, = plt.plot(t, 'YOUR P_TOOL X COORS HERE','b',label='x')
+    x_plot, = plt.plot(t, P_tool[0], 'b', label='x')
     # Plot P_tool y vs time
-    y_plot, = plt.plot(t, 'YOUR P_TOOL Y COORS HERE','g',label='y')
+    y_plot, = plt.plot(t, P_tool[1], 'g', label='y')
     # Set axis size
     plt.axis([0, t[-1], -plot_size,  plot_size])
     # Add a legend
@@ -71,22 +84,23 @@ def draw_path():
     # Using the syntax given for the 1st plots,
     # Repeat for theta_1 and theta_2 vs time
     # Create a second plot window
-
+    f2 = plt.figure(2)
     # Plot theta_1 vs time
-
+    theta_1_plot, = plt.plot(t, thetas[:, 0], 'b', label=r'$\theta_1$')
     # Plot theta_2 vs time
-
+    theta_2_plot, = plt.plot(t, thetas[:, 1], 'g', label=r'$\theta_2$')
     # Set axis size
-    # Previously, this was 0:n for x and -plot_size:plot_size for y
-    # What would be a good axis range for angular y values?
-
+    plt.axis([0, t[-1], 0, 7])
     # Add a legend
-
+    plt.legend([theta_1_plot, theta_2_plot], [r'$\theta_1$', r'$\theta_2$'])
     # Add a plot title and axis labels
-
+    plt.title(r'$\theta_1$, $\theta_2$, vs time')
+    plt.xlabel('Time Steps')
+    plt.ylabel('radians')
     # Turn on plot grid
-
+    plt.grid(True)
     # Save this plot
+    plt.savefig("theta_time.png")
 
 
 if __name__ == '__main__':
